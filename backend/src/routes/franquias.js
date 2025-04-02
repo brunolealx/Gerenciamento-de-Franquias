@@ -9,3 +9,4 @@ router.put('/:id', franquiaController.atualizarFranquia);
 router.delete('/:id', franquiaController.deletarFranquia);
 
 module.exports = router;
+

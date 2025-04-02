@@ -1,4 +1,3 @@
-// src/app.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -9,11 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 // Importação das rotas
+const authRoutes = require('./routes/auth');
 const franquiaRoutes = require('./routes/franquias');
-app.use('/api/franquias', franquiaRoutes);
 
+app.use('/api/auth', authRoutes);
+app.use('/api/franquias', franquiaRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
