@@ -3,13 +3,20 @@ const Franquia = require('../models/Franquia'); // Importando o modelo
 // Criar uma nova franquia
 exports.criarFranquia = async (req, res) => {
     try {
-        const franquiaExistente = await Franquia.findOne({ cnpj: req.body.cnpj });
+        const { nome, cnpj, endereco, telefone } = req.body;
+
+        // Verificação de campos obrigatórios
+        if (!nome || !cnpj || !endereco || !telefone) {
+            return res.status(400).json({ erro: 'Todos os campos são obrigatórios!' });
+        }
+
+        const franquiaExistente = await Franquia.findOne({ cnpj });
 
         if (franquiaExistente) {
             return res.status(400).json({ erro: 'Já existe uma franquia com esse CNPJ!' });
         }
 
-        const novaFranquia = new Franquia(req.body);
+        const novaFranquia = new Franquia({ nome, cnpj, endereco, telefone });
         await novaFranquia.save();
         res.status(201).json(novaFranquia);
     } catch (error) {
@@ -31,6 +38,11 @@ exports.listarFranquias = async (req, res) => {
 exports.atualizarFranquia = async (req, res) => {
     try {
         const franquiaAtualizada = await Franquia.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+        if (!franquiaAtualizada) {
+            return res.status(404).json({ erro: 'Franquia não encontrada!' });
+        }
+
         res.json(franquiaAtualizada);
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao atualizar franquia', detalhe: error.message });
@@ -40,6 +52,12 @@ exports.atualizarFranquia = async (req, res) => {
 // Deletar franquia por ID
 exports.deletarFranquia = async (req, res) => {
     try {
+        const franquia = await Franquia.findById(req.params.id);
+
+        if (!franquia) {
+            return res.status(404).json({ erro: 'Franquia não encontrada!' });
+        }
+
         await Franquia.findByIdAndDelete(req.params.id);
         res.json({ mensagem: 'Franquia deletada com sucesso' });
     } catch (error) {
